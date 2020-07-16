@@ -73,8 +73,8 @@ def update_figure(selected):
     filtered_gentr = gentr[gentr.ntacode == selected]
     fig = go.Figure(go.Scattermapbox(lat=filtered_gentr['Lat'],lon=filtered_gentr['Lon'],mode='markers',marker=go.scattermapbox.Marker(color=filtered_gentr['gentrifica'])))
     fig.update_layout(mapbox=dict(accesstoken=mapbox_access_token, center=dict(lon=-73.99,lat=40.72), zoom=10))
-    fig.update_layout(margin={"r":1,"t":1,"l":1,"b":1})
-    fig.update_layout({'height': 200})
+    fig.update_layout(margin={"r":20,"t":20,"l":20,"b":20})
+    fig.update_layout({'height': 200, 'width': 800})
     fig.update_layout(transition_duration=500)
     return fig
 

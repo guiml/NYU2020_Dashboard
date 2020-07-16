@@ -148,7 +148,7 @@ body {
  /* currently ems cause chrome bug misinterpreting rems on body element */
   line-height: 1.6;
   font-weight: 400;
-  color: rgb(50, 50, 50);
+  color: rgba(15, 15, 15, 0.596);
 }
 
 /* Typography –––––––––––––––––––––––––––––––––––––––––––––––––– */
@@ -419,7 +419,7 @@ html, body{
 }
 
 body {
-  background-color: #1E1E1E;
+  background-color: #8409cc;
   color: #d8d8d8;
   height: 100%;
   margin: 0;
@@ -446,7 +446,7 @@ a {
   text-decoration: none;
 }
 .bg-grey{
-  background-color: #31302F;
+  background-color: #ffffff;
 }
 .text-padding{
   padding: 5px;
