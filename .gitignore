@@ -1,0 +1,4 @@
+$ cat .gitignore
+# exclude everything except directory bin/ and lib/
+/bin
+/lib
