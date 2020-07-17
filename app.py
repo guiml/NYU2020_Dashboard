@@ -56,7 +56,6 @@ app.layout = html.Div(
                              children=[
                                  dcc.Graph(id='graph-with-slider'),
                                  dcc.Graph(id='graph1', figure=fig1),
-                                 dcc.Graph(id='graph2', figure=fig1)
                               ])
                               ])
         ]
