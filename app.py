@@ -52,11 +52,30 @@ app.layout = html.Div(
                                  html.H2('CEQR TOOL'),
                                  html.P('Select a neighborhood.'),
                                  html.Div(
-                                     className='div-for-dropdown',
+                                     className='div-for-dropdown1',
                                      children=[
-                                         dcc.Dropdown(id='year-slider', options=get_options(gentr[['ntacode','ntaname']].drop_duplicates()),
+                                         dcc.Dropdown(id='dropdown-neighborhood', options=get_options(gentr[['ntacode','ntaname']].drop_duplicates()),
                                                       multi=False, 
                                                       value="BK33",
+                                                      style={'backgroundColor': '#1E1E1E'}
+                                                      ),
+                                     ],
+                                     style={'color': '#1E1E1E'}),
+                                html.Br(),     
+                                html.P('Select the type of map to be shown'),
+                                html.Div(
+                                     className='div-for-dropdown2',
+                                     children=[
+                                         dcc.Dropdown(id='dropdown-type', options=[
+                                            {'label': 'Gentrification for Red Hook - Current Year', 'value': 'GRH_CY'},
+                                            {'label': 'Gentrification for NY - Current Year', 'value': 'GNY_CY'},
+                                            {'label': 'Residential Evictions for NY - Current Year', 'value': 'RENY_CY'},
+                                            {'label': 'Commercial Evictions for NY - Current Year', 'value': 'CENY_CY'},
+                                            {'label': 'Gentrification Prediction  for Red Hook - 5 Years', 'value': 'GPRH_5Y'},
+                                            {'label': 'Gentrification Prediction  for Red Hook - 10 Years', 'value': 'GPRH_10Y'}
+                                        ],
+                                                      multi=False, 
+                                                      value="GNY_CY",
                                                       style={'backgroundColor': '#1E1E1E'}
                                                       ),
                                      ],
@@ -65,7 +84,7 @@ app.layout = html.Div(
                              ),
                     html.Div(className='eight columns div-for-charts bg-grey',
                              children=[
-                                 dcc.Graph(id='graph-with-slider'),
+                                 dcc.Graph(id='mapplot'),
 				 dcc.Graph(id='graph1', figure=fig1)
                               ])
                               ])
@@ -75,24 +94,51 @@ app.layout = html.Div(
 
 
 @app.callback(
-    Output('graph-with-slider', 'figure'),
-    [Input('year-slider', 'value')])
-def update_figure(selected):
-    selectedval = selected
-    filtered_gentr = gentr[gentr.ntacode == selected]
-    commercial_evictions = px.choropleth_mapbox(evictions_df, geojson=ny_zip,locations = 'MODZCTA' ,featureidkey="properties.MODZCTA",color='commercial_pctl_score',
+    Output('mapplot', 'figure'),
+    [Input('dropdown-neighborhood', 'value'),
+     Input('dropdown-type', 'value'),])
+def update_figure(neighborhood,type):
+    selectedval = neighborhood
+    filtered_gentr = gentr[gentr.ntacode == neighborhood]
+
+    if type == 'GNY_CY':
+        typeofmap = gentrification_2018_ny
+        geojsonobject = ny_map
+        fidkey = "properties.geo_id"
+        clr = 'prediction'
+        lctions = 'geo_id'
+        rngclrmin, rngclrmax = 0, 1
+        lbls = 'Gentrification Prediction - NY'
+    elif type == 'GRH_CY':
+        typeofmap = gentrification_2018_df
+        geojsonobject = tracts
+        fidkey = "properties.geo_id"
+        clr = 'prediction'
+        lctions = 'geo_id'
+        rngclrmin, rngclrmax = 0, 0.1
+        lbls = 'Gentrification Prediction - RedHook'
+    elif type == 'RENY_CY':
+        typeofmap = evictions_df
+        geojsonobject = ny_zip
+        fidkey = "properties.MODZCTA"
+        clr = 'residential_pctl_score'
+        lctions = 'MODZCTA'
+        rngclrmin, rngclrmax = 0, 100
+        lbls = 'Residential Evictions Percentile Score'
+
+    plotmap = px.choropleth_mapbox(typeofmap, geojson=geojsonobject,locations = lctions, featureidkey=fidkey, color=clr,
                            color_continuous_scale="Viridis",
-                           range_color=(0, 100),
+                           range_color=(rngclrmin, rngclrmax),
                            mapbox_style="carto-positron",
                            zoom=10, center = {"lat": 40.724576, "lon": -73.916812},
                            opacity=0.5,
-                           labels={'prediction':'Commercial Evictions Percentile Score'}
+                           labels={'prediction':lbls}
                           )
-    commercial_evictions.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-    commercial_evictions.update_layout({'height': 200, 'width': 800})
-    return commercial_evictions
+    plotmap.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+    plotmap.update_layout({'height': 400, 'width': 800})
+    return plotmap
 
 
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
