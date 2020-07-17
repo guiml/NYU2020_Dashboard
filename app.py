@@ -13,6 +13,7 @@ mapbox_access_token = 'pk.eyJ1IjoiZ3VqaW1sIiwiYSI6ImNrY21pamg4dDAxZmEyc2xjdzZtNj
 # Initialize the app
 app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
+server = app.server
 
 #building_sales = pd.read_csv('data/sales.csv')
 #building_sales = building_sales[building_sales['SALE PRICE'] != 0]
