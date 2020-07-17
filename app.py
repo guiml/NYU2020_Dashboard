@@ -14,9 +14,8 @@ mapbox_access_token = 'pk.eyJ1IjoiZ3VqaW1sIiwiYSI6ImNrY21pamg4dDAxZmEyc2xjdzZtNj
 app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
 
-building_sales = pd.read_csv('data/sales_lat_long.csv')
+building_sales = pd.read_csv('data/sales.csv')
 building_sales = building_sales[building_sales['SALE PRICE'] != 0]
-#building_sales = building_sales.drop(columns=['Unnamed: 0'])
 building_sales['SALE DATE'] = pd.to_datetime(building_sales['SALE DATE'])
 time_price = building_sales[['SALE DATE','SALE PRICE']]
 df_time = time_price.set_index(['SALE DATE'])
@@ -81,4 +80,4 @@ def update_figure(selected):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
