@@ -15,15 +15,15 @@ app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
 server = app.server
 
-#building_sales = pd.read_csv('data/sales.csv')
-#building_sales = building_sales[building_sales['SALE PRICE'] != 0]
-#building_sales['SALE DATE'] = pd.to_datetime(building_sales['SALE DATE'])
-#time_price = building_sales[['SALE DATE','SALE PRICE']]
-#df_time = time_price.set_index(['SALE DATE'])
-#time_price_means = df_time.resample('M').mean()
-#time_price_means['Date'] = time_price_means.index
-#fig1 = px.line(time_price_means, x='Date', y='SALE PRICE')
-#fig1['layout'].update({'height': 200})
+building_sales = pd.read_csv('data/sales.csv')
+building_sales = building_sales[building_sales['SALE PRICE'] != 0]
+building_sales['SALE DATE'] = pd.to_datetime(building_sales['SALE DATE'])
+time_price = building_sales[['SALE DATE','SALE PRICE']]
+df_time = time_price.set_index(['SALE DATE'])
+time_price_means = df_time.resample('M').mean()
+time_price_means['Date'] = time_price_means.index
+fig1 = px.line(time_price_means, x='Date', y='SALE PRICE')
+fig1['layout'].update({'height': 200})
 
 
 def get_options(df_menu):
@@ -55,7 +55,8 @@ app.layout = html.Div(
                              ),
                     html.Div(className='eight columns div-for-charts bg-grey',
                              children=[
-                                 dcc.Graph(id='graph-with-slider')
+                                 dcc.Graph(id='graph-with-slider'),
+				 dcc.Graph(id='graph1', figure=fig1)
                               ])
                               ])
         ]
