@@ -15,13 +15,15 @@ app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
 server = app.server
 
-building_sales = pd.read_csv('data/sales.csv')
-building_sales = building_sales[building_sales['SALE PRICE'] != 0]
-building_sales['SALE DATE'] = pd.to_datetime(building_sales['SALE DATE'])
-time_price = building_sales[['SALE DATE','SALE PRICE']]
-df_time = time_price.set_index(['SALE DATE'])
-time_price_means = df_time.resample('M').mean()
-time_price_means['Date'] = time_price_means.index
+#building_sales = pd.read_csv('data/sales.csv')
+#building_sales = building_sales[building_sales['SALE PRICE'] != 0]
+#building_sales['SALE DATE'] = pd.to_datetime(building_sales['SALE DATE'])
+#time_price = building_sales[['SALE DATE','SALE PRICE']]
+#df_time = time_price.set_index(['SALE DATE'])
+#time_price_means = df_time.resample('M').mean()
+#time_price_means['Date'] = time_price_means.index
+
+time_price_means = pd.read_csv('data/timepricemeans.csv')
 fig1 = px.line(time_price_means, x='Date', y='SALE PRICE')
 fig1['layout'].update({'height': 200})
 
