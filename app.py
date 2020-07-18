@@ -13,7 +13,7 @@ import datetime as dt
 
 gentr = pd.read_csv('data/gentrification.csv')
 gentr.sort_values(by=['ntaname'], inplace=True)
-mapbox_access_token = 'pk.eyJ1IjoiZ3VqaW1sIiwiYSI6ImNrY21pamg4dDAxZmEyc2xjdzZtNjY3YTIifQ.PKI5m9ZE6OTgj_ZhBCHyiw'
+
 
 # Initialize the app
 app = dash.Dash(__name__)
@@ -221,4 +221,4 @@ def update_map(neighborhood,typechart):
 
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
