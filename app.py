@@ -34,6 +34,8 @@ with urlopen('https://gist.githubusercontent.com/akash-y/6aa5d1fe4bfecda6b2ba7bd
 gentrification_2018_df = pd.read_csv('https://gist.githubusercontent.com/akash-y/aa7e340b02ac6f8cc78b3f5698bb95b8/raw/87deac83e18a099ac02ca215e3af354c7581f4eb/redhook_predictions_2018.csv')
 gentrification_2018_ny = pd.read_csv('https://gist.githubusercontent.com/akash-y/0e6a14fa614aabb16b5b35a5273e44ca/raw/ee7aace5cf795aa005cc563c02be97552633b7da/ny_gentrification_2018.csv')
 evictions_df = pd.read_csv('https://gist.githubusercontent.com/akash-y/e0ffea12dde217ec49546ffa66461ce5/raw/143edbf60b34e34139545cba079124ed01833652/ny_evictions.csv')
+redhook_5yr_prediction = pd.read_csv('https://gist.githubusercontent.com/akash-y/4b3e114d2cfdd22aab9462d4db942999/raw/16ae0b48e1094d27a4e3460c3cfb4dda6f047161/redhook_5_gentrification_prediction.csv')
+redhook_10yr_prediction = pd.read_csv('https://gist.githubusercontent.com/akash-y/f0a8d865efd78008f49d4f5602ffcf34/raw/1c3f7cb79e521dc3188e817610148ed044dae1b4/redhook_10_gentrification_prediction.csv')
 
 
 def get_options(df_menu):
@@ -104,7 +106,7 @@ def update_figure(neighborhood,type):
     if type == 'GNY_CY':
         typeofmap = gentrification_2018_ny
         geojsonobject = ny_map
-        fidkey = "properties.geo_id"
+        fidkey = 'properties.geo_id'
         clr = 'prediction'
         lctions = 'geo_id'
         rngclrmin, rngclrmax = 0, 1
@@ -112,30 +114,54 @@ def update_figure(neighborhood,type):
     elif type == 'GRH_CY':
         typeofmap = gentrification_2018_df
         geojsonobject = tracts
-        fidkey = "properties.geo_id"
+        fidkey = 'properties.geo_id'
         clr = 'prediction'
         lctions = 'geo_id'
         rngclrmin, rngclrmax = 0, 0.1
         lbls = 'Gentrification Prediction - RedHook'
     elif type == 'RENY_CY':
-        typeofmap = evictions_df
+        typeofmap = evictions_df 
         geojsonobject = ny_zip
-        fidkey = "properties.MODZCTA"
+        fidkey = 'properties.MODZCTA'
         clr = 'residential_pctl_score'
         lctions = 'MODZCTA'
         rngclrmin, rngclrmax = 0, 100
         lbls = 'Residential Evictions Percentile Score'
+    elif type == 'CENY_CY':
+        typeofmap = evictions_df 
+        geojsonobject = ny_zip
+        fidkey = 'properties.MODZCTA'
+        clr = 'commercial_pctl_score'
+        lctions = 'MODZCTA'
+        rngclrmin, rngclrmax = 0, 100
+        lbls = 'Commercial Evictions Percentile Score'
+    elif type == 'GPRH_5Y':
+        typeofmap = redhook_5yr_prediction 
+        geojsonobject = tracts
+        fidkey = 'properties.geo_id'
+        clr = 'prediction'
+        lctions = 'geo_id'
+        rngclrmin, rngclrmax = 0, 0.1
+        lbls = 'Gentrification Prediction 5 Yrs - RedHook'
+    elif type == 'GPRH_10Y':
+        typeofmap = redhook_10yr_prediction 
+        geojsonobject = tracts
+        fidkey = 'properties.geo_id'
+        clr = 'prediction'
+        lctions = 'geo_id'
+        rngclrmin, rngclrmax = 0, 0.1
+        lbls = 'Gentrification Prediction 10 Yrs - RedHook'
 
     plotmap = px.choropleth_mapbox(typeofmap, geojson=geojsonobject,locations = lctions, featureidkey=fidkey, color=clr,
                            color_continuous_scale="Viridis",
                            range_color=(rngclrmin, rngclrmax),
                            mapbox_style="carto-positron",
-                           zoom=10, center = {"lat": 40.724576, "lon": -73.916812},
+                           zoom=8, center = {"lat": 40.724576, "lon": -73.916812},
                            opacity=0.5,
                            labels={'prediction':lbls}
                           )
-    plotmap.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
-    plotmap.update_layout({'height': 400, 'width': 800})
+    plotmap.update_layout(margin={"r":0,"t":40,"l":60,"b":0})
+    plotmap.update_layout({'height': 400, 'width': 760})
     return plotmap
 
 
