@@ -20,6 +20,71 @@ app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
 server = app.server
 
+
+demo_df = pd.read_csv('https://gist.githubusercontent.com/akash-y/f3c9ffed2e11ebaa8894022f17d66637/raw/4001da73fa67871e0a60ee7ec747cafd44c310a8/redhook_demographic_predictions.csv')
+
+demo_df['geo_id'] = demo_df['geo_id'].astype(str)
+
+def f(row):
+  if row['geo_id'] == '36047005300':
+    val = 'Red Hook Tract 36047005300'
+  elif row['geo_id'] == '36047004700':
+    val = 'Red Hook Tract 36047004700'
+  elif row['geo_id'] == '36047005900':
+    val = 'Red Hook Tract 36047005900'
+  else:
+    val = 'Red Hook Tract 36047008500'
+  return val
+
+demo_df['CT'] = demo_df.apply(f, axis=1)
+
+#Layout for all demographic predictions
+
+demopred_layout = go.Layout(xaxis={'title': 'Census Tract'},
+                    yaxis={'title': 'Demographic Predictions'},
+                    hovermode='closest')
+
+#Bar chart for income prediction
+
+incomepred = go.Figure(data=[
+    go.Bar(name='2018', x=demo_df[demo_df['year']==2018]['CT'], y=demo_df[demo_df['year']==2018]['median_income'], marker_color='indianred'),
+    go.Bar(name='2022', x=demo_df[demo_df['year']==2022]['CT'], y=demo_df[demo_df['year']==2022]['median_income'], marker_color='lightyellow'),
+    go.Bar(name='2027', x=demo_df[demo_df['year']==2027]['CT'], y=demo_df[demo_df['year']==2027]['median_income'], marker_color='lightblue')
+], layout = demopred_layout)
+incomepred['layout'].update({'height': 200})
+incomepred.update_layout(margin={"r":20,"t":0,"l":20,"b":0})
+
+#Bar chart for white population prediction
+
+whitepred = go.Figure(data=[
+    go.Bar(name='2018', x=demo_df[demo_df['year']==2018]['CT'], y=demo_df[demo_df['year']==2018]['white_pop'], marker_color='indianred'),
+    go.Bar(name='2022', x=demo_df[demo_df['year']==2022]['CT'], y=demo_df[demo_df['year']==2022]['white_pop'], marker_color='lightyellow'),
+    go.Bar(name='2027', x=demo_df[demo_df['year']==2027]['CT'], y=demo_df[demo_df['year']==2027]['white_pop'], marker_color='lightblue')
+], layout = demopred_layout)
+whitepred['layout'].update({'height': 200})
+whitepred.update_layout(margin={"r":20,"t":0,"l":20,"b":0})
+
+#Bar chart for other races population prediction
+
+racepred = go.Figure(data=[
+    go.Bar(name='2018', x=demo_df[demo_df['year']==2018]['CT'], y=demo_df[demo_df['year']==2018]['other_races'], marker_color='indianred'),
+    go.Bar(name='2022', x=demo_df[demo_df['year']==2022]['CT'], y=demo_df[demo_df['year']==2022]['other_races'], marker_color='lightyellow'),
+    go.Bar(name='2027', x=demo_df[demo_df['year']==2027]['CT'], y=demo_df[demo_df['year']==2027]['other_races'], marker_color='lightblue')
+], layout = demopred_layout)
+racepred['layout'].update({'height': 200})
+racepred.update_layout(margin={"r":20,"t":0,"l":20,"b":0})
+
+#Bar chart for vacant housing prediction
+
+housepred = go.Figure(data=[
+    go.Bar(name='2018', x=demo_df[demo_df['year']==2018]['CT'], y=demo_df[demo_df['year']==2018]['vacant_housing_units'], marker_color='indianred'),
+    go.Bar(name='2022', x=demo_df[demo_df['year']==2022]['CT'], y=demo_df[demo_df['year']==2022]['vacant_housing_units'], marker_color='lightyellow'),
+    go.Bar(name='2027', x=demo_df[demo_df['year']==2027]['CT'], y=demo_df[demo_df['year']==2027]['vacant_housing_units'], marker_color='lightblue')
+], layout = demopred_layout)
+housepred['layout'].update({'height': 200})
+housepred.update_layout(margin={"r":20,"t":0,"l":20,"b":0})
+
+
 time_price_means = pd.read_csv('data/timepricemeans.csv')
 time_price_means['Date'] = pd.to_datetime(time_price_means['Date'])
 time_price_means['Year'] = time_price_means['Date'].dt.year
@@ -62,7 +127,7 @@ gentrification_2018_df = pd.read_csv('https://gist.githubusercontent.com/akash-y
 gentrification_2018_ny = pd.read_csv('https://gist.githubusercontent.com/akash-y/0e6a14fa614aabb16b5b35a5273e44ca/raw/ee7aace5cf795aa005cc563c02be97552633b7da/ny_gentrification_2018.csv')
 evictions_df = pd.read_csv('https://gist.githubusercontent.com/akash-y/e0ffea12dde217ec49546ffa66461ce5/raw/143edbf60b34e34139545cba079124ed01833652/ny_evictions.csv')
 redhook_5yr_prediction = pd.read_csv('https://gist.githubusercontent.com/akash-y/4b3e114d2cfdd22aab9462d4db942999/raw/16ae0b48e1094d27a4e3460c3cfb4dda6f047161/redhook_5_gentrification_prediction.csv')
-redhook_10yr_prediction = pd.read_csv('https://gist.githubusercontent.com/akash-y/f0a8d865efd78008f49d4f5602ffcf34/raw/1c3f7cb79e521dc3188e817610148ed044dae1b4/redhook_10_gentrification_prediction.csv')
+redhook_10yr_prediction = pd.read_csv('https://gist.githubusercontent.com/akash-y/f0a8d865efd78008f49d4f5602ffcf34/raw/568f942864a552cef6abaef09feddbb07eeac3b0/redhook_10_gentrification_prediction.csv')
 
 def get_options(df_menu):
     dict_list = []
@@ -77,7 +142,7 @@ app.layout = html.Div(
                  children=[
                     html.Div(className='four columns div-user-controls',
                              children=[
-                                 html.H2('CEQR TOOL', style={'font-family': 'Tahoma', 'font-size': '20px', 'color': 'yellow'}),
+                                 html.H2('CEQR TOOL (BETA)', style={'font-family': 'Tahoma', 'font-size': '20px', 'color': 'yellow'}),
                                  html.Hr(),
                                  html.P('Center map in a specific neighborhood:', style={'font-family': 'Tahoma', 'font-size': '14px'}),
                                  html.Div(
@@ -119,10 +184,15 @@ app.layout = html.Div(
                              ),
                     html.Div(className='eight columns div-for-charts bg-grey',
                              children=[
+                                 html.Br(),
+                                 html.Br(),
+                                 html.Br(), 
+                                 html.P('[[[---TEMPLATE BEING UPDATED---]]]', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
+                                 html.P('Gentrification and Eviction Risk Maps', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
                                  dcc.Graph(id='mapplot',style={'font-family': 'Tahoma'}),
                                  html.P('Historical Sales Price', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
                                  dcc.Graph(id='linechart'),
-                                 html.P('Future Price', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
+                                 html.P('Future Price for Redhook (Smoothing Applied)', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
                                  #dcc.Slider(
                                  #    id='year-slider',
                                  #    min=time_price_means['Year'].min(),
@@ -130,7 +200,15 @@ app.layout = html.Div(
                                  #    value=2019,
                                  #    marks={str(year): str(year) for year in time_price_means['Year'].unique()},
                                  #    step=None),
-                                 dcc.Graph(id='pred', figure=figpred)
+                                 dcc.Graph(id='pred', figure=figpred),
+                                 html.P('Median Income Predictions - Redhook (5 and 10 Years)', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
+                                 dcc.Graph(id='incomepred', figure=incomepred),
+                                 html.P('White Population Prediction % - Redhook (5 and 10 Years)', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
+                                 dcc.Graph(id='whitepred', figure=whitepred),
+                                 html.P('Other Race Population Prediction % - Redhook (5 and 10 Years)', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
+                                 dcc.Graph(id='racepred', figure=racepred),
+                                 html.P('Vacant Housing Units Prediction % - Redhook (5 and 10 Years)', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
+                                 dcc.Graph(id='housepred', figure=housepred)
                               ])
                               ])
         ],
@@ -200,7 +278,7 @@ def update_map(neighborhood,typechart):
         lbls = 'Gentrification Prediction 10 Yrs - RedHook'
 
     plotmap = px.choropleth_mapbox(typeofmap, geojson=geojsonobject,locations = lctions, featureidkey=fidkey, color=clr,
-                           color_continuous_scale="Viridis",
+                           color_continuous_scale="RdBu_r",
                            range_color=(rngclrmin, rngclrmax),
                            mapbox_style="carto-positron",
                            zoom=9, center = {"lat": meanlat, "lon": meanlon},
