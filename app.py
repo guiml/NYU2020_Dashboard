@@ -8,8 +8,11 @@ import plotly.express as px
 from dash.dependencies import Input, Output
 import json
 from urllib.request import urlopen
+import datetime as dt
+
 
 gentr = pd.read_csv('data/gentrification.csv')
+gentr.sort_values(by=['ntaname'], inplace=True)
 mapbox_access_token = 'pk.eyJ1IjoiZ3VqaW1sIiwiYSI6ImNrY21pamg4dDAxZmEyc2xjdzZtNjY3YTIifQ.PKI5m9ZE6OTgj_ZhBCHyiw'
 
 # Initialize the app
@@ -18,8 +21,32 @@ app.config.suppress_callback_exceptions = True
 server = app.server
 
 time_price_means = pd.read_csv('data/timepricemeans.csv')
-fig1 = px.line(time_price_means, x='Date', y='SALE PRICE')
-fig1['layout'].update({'height': 200})
+time_price_means['Date'] = pd.to_datetime(time_price_means['Date'])
+time_price_means['Year'] = time_price_means['Date'].dt.year
+
+
+pricepred = pd.read_csv('data/med_rent_pred_cons.csv')
+pricepred['date'] = pd.to_datetime(pricepred['date'])
+pricepred['Year'] = pricepred['date'].dt.year
+pricepred.sort_values(by = 'date', inplace=True)
+
+groups = pricepred.groupby(by='Type')
+data = []
+colors=['blue', 'green']
+for group, dataframe in groups:
+    dataframe = dataframe.sort_values(by=['date'])
+    trace = go.Scatter(x=dataframe.date.tolist(), 
+                       y=dataframe.future_price.tolist(),
+                       marker=dict(color=colors[len(data)]),
+                       name=group)
+    data.append(trace)
+
+layout =  go.Layout(xaxis={'title': 'Time'},
+                    yaxis={'title': 'PRICE PRED'},
+                    hovermode='closest')
+figpred = go.Figure(data=data, layout=layout)
+figpred['layout'].update({'height': 130})  
+figpred.update_layout(margin={"r":20,"t":0,"l":20,"b":0})
 
 
 
@@ -37,7 +64,6 @@ evictions_df = pd.read_csv('https://gist.githubusercontent.com/akash-y/e0ffea12d
 redhook_5yr_prediction = pd.read_csv('https://gist.githubusercontent.com/akash-y/4b3e114d2cfdd22aab9462d4db942999/raw/16ae0b48e1094d27a4e3460c3cfb4dda6f047161/redhook_5_gentrification_prediction.csv')
 redhook_10yr_prediction = pd.read_csv('https://gist.githubusercontent.com/akash-y/f0a8d865efd78008f49d4f5602ffcf34/raw/1c3f7cb79e521dc3188e817610148ed044dae1b4/redhook_10_gentrification_prediction.csv')
 
-
 def get_options(df_menu):
     dict_list = []
     for i, j in df_menu.iterrows(): 
@@ -51,22 +77,23 @@ app.layout = html.Div(
                  children=[
                     html.Div(className='four columns div-user-controls',
                              children=[
-                                 html.H2('CEQR TOOL'),
-                                 html.P('Select a neighborhood.'),
+                                 html.H2('CEQR TOOL', style={'font-family': 'Tahoma', 'font-size': '20px', 'color': 'yellow'}),
+                                 html.Hr(),
+                                 html.P('Center map in a specific neighborhood:', style={'font-family': 'Tahoma', 'font-size': '14px'}),
                                  html.Div(
-                                     className='div-for-dropdown1',
+                                     className='dropdown1',
                                      children=[
                                          dcc.Dropdown(id='dropdown-neighborhood', options=get_options(gentr[['ntacode','ntaname']].drop_duplicates()),
                                                       multi=False, 
                                                       value="BK33",
-                                                      style={'backgroundColor': '#1E1E1E'}
+                                                      style={'backgroundColor': '#1E1E1E','font-family': 'Tahoma', 'font-size': '12px'}
                                                       ),
                                      ],
                                      style={'color': '#1E1E1E'}),
                                 html.Br(),     
-                                html.P('Select the type of map to be shown'),
+                                html.P('Select the type of map to be shown:', style={'font-family': 'Tahoma', 'font-size': '14px'}),
                                 html.Div(
-                                     className='div-for-dropdown2',
+                                     className='dropdown2',
                                      children=[
                                          dcc.Dropdown(id='dropdown-type', options=[
                                             {'label': 'Gentrification for Red Hook - Current Year', 'value': 'GRH_CY'},
@@ -78,7 +105,7 @@ app.layout = html.Div(
                                         ],
                                                       multi=False, 
                                                       value="GNY_CY",
-                                                      style={'backgroundColor': '#1E1E1E'}
+                                                      style={'backgroundColor': '#1E1E1E','font-family': 'Tahoma', 'font-size': '12px'}
                                                       ),
                                      ],
                                      style={'color': '#1E1E1E'})
@@ -86,24 +113,38 @@ app.layout = html.Div(
                              ),
                     html.Div(className='eight columns div-for-charts bg-grey',
                              children=[
-                                 dcc.Graph(id='mapplot'),
-				 dcc.Graph(id='graph1', figure=fig1)
+                                 dcc.Graph(id='mapplot',style={'font-family': 'Tahoma'}),
+                                 html.P('Historical Sales Price', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
+                                 dcc.Graph(id='linechart'),
+                                 html.P('Future Price', style={'font-family': 'Tahoma', 'font-size': '14px', 'color': '#949494', 'font-weight': 'bold', 'text-align': 'center'}),
+                                 #dcc.Slider(
+                                 #    id='year-slider',
+                                 #    min=time_price_means['Year'].min(),
+                                 #    max=time_price_means['Year'].max(),
+                                 #    value=2019,
+                                 #    marks={str(year): str(year) for year in time_price_means['Year'].unique()},
+                                 #    step=None),
+                                 dcc.Graph(id='pred', figure=figpred)
                               ])
                               ])
-        ]
+        ],
+        style={'font-family': 'Tahoma'}
 )
 
 
 
 @app.callback(
-    Output('mapplot', 'figure'),
+    [Output('mapplot', 'figure'),
+     Output('linechart', 'figure')],
     [Input('dropdown-neighborhood', 'value'),
-     Input('dropdown-type', 'value'),])
-def update_figure(neighborhood,type):
+     Input('dropdown-type', 'value')])
+def update_map(neighborhood,typechart):
     selectedval = neighborhood
     filtered_gentr = gentr[gentr.ntacode == neighborhood]
+    meanlat = filtered_gentr.loc[:,"Lat"].mean()
+    meanlon = filtered_gentr.loc[:,"Lon"].mean()
 
-    if type == 'GNY_CY':
+    if typechart == 'GNY_CY':
         typeofmap = gentrification_2018_ny
         geojsonobject = ny_map
         fidkey = 'properties.geo_id'
@@ -111,7 +152,7 @@ def update_figure(neighborhood,type):
         lctions = 'geo_id'
         rngclrmin, rngclrmax = 0, 1
         lbls = 'Gentrification Prediction - NY'
-    elif type == 'GRH_CY':
+    elif typechart == 'GRH_CY':
         typeofmap = gentrification_2018_df
         geojsonobject = tracts
         fidkey = 'properties.geo_id'
@@ -119,7 +160,7 @@ def update_figure(neighborhood,type):
         lctions = 'geo_id'
         rngclrmin, rngclrmax = 0, 0.1
         lbls = 'Gentrification Prediction - RedHook'
-    elif type == 'RENY_CY':
+    elif typechart == 'RENY_CY':
         typeofmap = evictions_df 
         geojsonobject = ny_zip
         fidkey = 'properties.MODZCTA'
@@ -127,7 +168,7 @@ def update_figure(neighborhood,type):
         lctions = 'MODZCTA'
         rngclrmin, rngclrmax = 0, 100
         lbls = 'Residential Evictions Percentile Score'
-    elif type == 'CENY_CY':
+    elif typechart == 'CENY_CY':
         typeofmap = evictions_df 
         geojsonobject = ny_zip
         fidkey = 'properties.MODZCTA'
@@ -135,7 +176,7 @@ def update_figure(neighborhood,type):
         lctions = 'MODZCTA'
         rngclrmin, rngclrmax = 0, 100
         lbls = 'Commercial Evictions Percentile Score'
-    elif type == 'GPRH_5Y':
+    elif typechart == 'GPRH_5Y':
         typeofmap = redhook_5yr_prediction 
         geojsonobject = tracts
         fidkey = 'properties.geo_id'
@@ -143,7 +184,7 @@ def update_figure(neighborhood,type):
         lctions = 'geo_id'
         rngclrmin, rngclrmax = 0, 0.1
         lbls = 'Gentrification Prediction 5 Yrs - RedHook'
-    elif type == 'GPRH_10Y':
+    elif typechart == 'GPRH_10Y':
         typeofmap = redhook_10yr_prediction 
         geojsonobject = tracts
         fidkey = 'properties.geo_id'
@@ -156,13 +197,20 @@ def update_figure(neighborhood,type):
                            color_continuous_scale="Viridis",
                            range_color=(rngclrmin, rngclrmax),
                            mapbox_style="carto-positron",
-                           zoom=8, center = {"lat": 40.724576, "lon": -73.916812},
-                           opacity=0.5,
-                           labels={'prediction':lbls}
+                           zoom=9, center = {"lat": meanlat, "lon": meanlon},
+                           opacity=0.75,
+                           labels={'prediction':'Pred'}
                           )
-    plotmap.update_layout(margin={"r":0,"t":40,"l":60,"b":0})
-    plotmap.update_layout({'height': 400, 'width': 760})
-    return plotmap
+    plotmap.update_layout(margin={"r":20,"t":50,"l":20,"b":20})
+    plotmap.update_layout({'height': 280, 'width': 760})
+
+
+    #filtered_df = time_price_means[time_price_means.Year <= yearslider]
+    linechart = px.line(time_price_means, x='Date', y='SALE PRICE')
+    linechart['layout'].update({'height': 130, 'width': 760})
+    linechart.update_layout(margin={"r":20,"t":0,"l":20,"b":0})
+
+    return plotmap, linechart
 
 
 

@@ -419,7 +419,7 @@ html, body{
 }
 
 body {
-  background-color: #8409cc;
+  background-color: #57068c;
   color: #d8d8d8;
   height: 100%;
   margin: 0;
@@ -473,8 +473,8 @@ a {
   padding-top: 64px;
 }
 .div-for-dropdown {
-  padding-top: 12px;
-  padding-bottom: 12px;
+  padding-top: 4px;
+  padding-bottom: 4px;
 }
 .div-for-slider {
   width: 97%;
