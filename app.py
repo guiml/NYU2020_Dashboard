@@ -41,7 +41,7 @@ for group, dataframe in groups:
                        name=group)
     data.append(trace)
 
-layout =  go.Layout(xaxis={'title': 'Time'},
+layout =  go.Layout(xaxis={'title': 'Date'},
                     yaxis={'title': 'PRICE PRED'},
                     hovermode='closest')
 figpred = go.Figure(data=data, layout=layout)
@@ -108,7 +108,13 @@ app.layout = html.Div(
                                                       style={'backgroundColor': '#1E1E1E','font-family': 'Tahoma', 'font-size': '12px'}
                                                       ),
                                      ],
-                                     style={'color': '#1E1E1E'})
+                                     style={'color': '#1E1E1E'}),
+                                 html.Hr(),
+                                 html.P('INSTRUCTIONS', style={'font-family': 'Tahoma', 'font-size': '14px', 'text-decoration': 'underline'}),
+                                 html.P('1) Select the type of map  to be shown.', style={'font-family': 'Tahoma', 'font-size': '14px'}),
+                                 html.P('2) Select the neighborhood where you want the map to be centered.', style={'font-family': 'Tahoma', 'font-size': '14px'}),
+                                 html.Hr(),
+                                 html.P('NYU - CUSP 2020', style={'font-family': 'Tahoma', 'font-size': '14px'}),
                                 ]
                              ),
                     html.Div(className='eight columns div-for-charts bg-grey',
