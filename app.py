@@ -57,12 +57,6 @@ plotmap = px.choropleth_mapbox(typeofmap, geojson=geojsonobject,locations = lcti
 plotmap.update_layout(margin={"r":0,"t":0,"l":0,"b":10})
 plotmap.update_layout({'height': 500, 'width': 1000})
 
-
-
-
-
-
-
 ## FURTHER CHARTS
 ny_trace = go.Scatter(
     name='New York',
@@ -125,7 +119,7 @@ app.layout = html.Div(className="row",
                 ]),
                 html.Br(),
                 html.H5('ABOUT THIS TOOL', style=LeftTitle),
-                html.P('This website is the visualization part of the Digital CEQR capstone projectl, NYU CUSP class of 2020.', style=LeftText),
+                html.P('This website is the visualization part of the Digital CEQR capstone project group, NYU CUSP class of 2020.', style=LeftText),
                 html.P('The purpose of this tool is to visualize the results derived from the analysis performed by the team in collaboration with the sponsor of this project (inCitu).', style=LeftText),
                 html.Br(),
                 html.Br(),
@@ -214,4 +208,4 @@ def update_figure(selected_map):
     return plotmap
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)

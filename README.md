@@ -12,7 +12,7 @@ To execute this dashboard I recommend to have Anaconda installed.
 2) Create a Python virtual environment
 3) Activate Python virtual environment
 4) Execute pip install -r requirements.txt
-5) Execute python application.py
+5) Execute python app.py
 6) Copy the URL address shown (ex: http://127.0.0.1:8050/)
 7) Open the URL (ex: http://127.0.0.1:8050/) on browser
 
