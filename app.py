@@ -10,7 +10,7 @@ import json
 from urllib.request import urlopen
 import datetime as dt
 from datetime import datetime, timedelta
-
+import numpy as np
 
 # Initialize the app
 app = dash.Dash(__name__)
@@ -38,9 +38,9 @@ redhook_10yr_prediction = pd.read_csv('data/redhook_10_gentrification_prediction
 
 
 ## OPEN GEOJSON
-with open('data/tracts.geojson') as response:
+with open('data/redhook_clipped_gp_2018.geojson') as response:
     tracts = json.load(response)
-with open('data/ny_map.geojson') as response:
+with open('data/ny_clipped_gp_2018.geojson') as response:
     ny_map = json.load(response)
 with open('data/ny_zip.geojson') as response:
     ny_zip = json.load(response)
@@ -58,9 +58,10 @@ plotmap.update_layout(margin={"r":0,"t":0,"l":0,"b":10})
 plotmap.update_layout({'height': 500, 'width': 1000})
 
 ## FURTHER CHARTS
+
 ny_trace = go.Scatter(
     name='New York',
-    x=pred_df_ny.index,
+    x=pred_df_ny['date'],
     y=pred_df_ny['median_rent_all'],
     mode='lines',
     line=dict(color='rgb(31, 119, 180)'),
@@ -68,7 +69,7 @@ ny_trace = go.Scatter(
 
 rh_trace = go.Scatter(
     name='Red Hook',
-    x=pred_df_rh.index,
+    x=pred_df_rh['date'],
     y=pred_df_rh['median_rent_all'],
     mode='lines',
     line=dict(color='rgb(205,92,92)'),
@@ -92,7 +93,8 @@ fig_further1.update_layout(shapes=[
       xref= 'x', x0= datetime(year=2020,month=5, day=31), x1= datetime(year=2020,month=5, day=31)
     )
 ])
-fig_further1.update_layout({'height': 280, 'width': 1005})
+fig_further1.update_layout({'height': 350, 'width': 1005})
+
 
 app.layout = html.Div(className="row",
     children=[
@@ -133,9 +135,16 @@ app.layout = html.Div(className="row",
         html.Div(className='column right',
             children=[dcc.Graph(id='displacement_map')]),
         html.Div(className='column right', style={'background-color': 'whitesmoke'},
-            children=[html.H2('Scroll down for further analysis...'),
-                    dcc.Graph(id='FurtherGraph1', figure=fig_further1)
-                    #html.P('a'),
+            children=[html.H2('Scroll down for result analysis...'),
+                    dcc.Graph(id='FurtherGraph1', figure=fig_further1),
+                    html.H2('Final results for Red Hook Area:'),
+                    html.P('Safe for approving rezoning proposals in Redhook? - “Safe”'),
+                    html.P('Probability of Gentrification in Redhook in 5 Years - “Low”'),
+                    html.P('Risk of Residential Eviction in Redhook - “Low”'),
+                    html.P('Risk of Commercial Eviction in Redhook - “Medium”'),
+                    html.P('Commercial Evictions in Redhook experienced mostly by small businesses like Tobacco Retailers '),
+                    html.P('Redhook Property Price Percentage Increase (5 Yrs Prediction) - 18%'),
+                    html.P('Redhook Property Price Percentage Increase (10 Yrs Prediction) - 24%')
             ])
     ])
 
@@ -208,4 +217,4 @@ def update_figure(selected_map):
     return plotmap
 
 if __name__ == '__main__':
-    app.run_server(debug=False)
+    app.run_server(debug=True)
