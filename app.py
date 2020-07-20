@@ -15,6 +15,7 @@ import numpy as np
 # Initialize the app
 app = dash.Dash(__name__)
 app.config.suppress_callback_exceptions = True
+app.title = 'Displacement visualization tool'
 server = app.server
 
 
@@ -168,6 +169,7 @@ def update_figure(selected_map):
         lctions = 'geo_id'
         rngclrmin, rngclrmax = 0, 1
         lbls = 'Gentrification Prediction - NY'
+        lat,lon,zoo = 40.71, -74, 9
     elif selected_map == 'GRH_CY':
         typeofmap = gentrification_2018_df
         geojsonobject = tracts
@@ -176,6 +178,7 @@ def update_figure(selected_map):
         lctions = 'geo_id'
         rngclrmin, rngclrmax = 0, 0.1
         lbls = 'Gentrification Prediction - RedHook'
+        lat,lon,zoo = 40.67, -74, 12
     elif selected_map == 'RENY_CY':
         typeofmap = evictions_df 
         geojsonobject = ny_zip
@@ -184,6 +187,7 @@ def update_figure(selected_map):
         lctions = 'MODZCTA'
         rngclrmin, rngclrmax = 0, 100
         lbls = 'Residential Evictions Percentile Score'
+        lat,lon,zoo = 40.71, -74, 9
     elif selected_map == 'CENY_CY':
         typeofmap = evictions_df 
         geojsonobject = ny_zip
@@ -192,6 +196,7 @@ def update_figure(selected_map):
         lctions = 'MODZCTA'
         rngclrmin, rngclrmax = 0, 100
         lbls = 'Commercial Evictions Percentile Score'
+        lat,lon,zoo = 40.71, -74, 9
     elif selected_map == 'GPRH_5Y':
         typeofmap = redhook_5yr_prediction 
         geojsonobject = tracts
@@ -200,6 +205,7 @@ def update_figure(selected_map):
         lctions = 'geo_id'
         rngclrmin, rngclrmax = 0, 0.1
         lbls = 'Gentrification Prediction 5 Yrs - RedHook'
+        lat,lon,zoo = 40.67, -74, 12
     elif selected_map == 'GPRH_10Y':
         typeofmap = redhook_10yr_prediction 
         geojsonobject = tracts
@@ -208,10 +214,11 @@ def update_figure(selected_map):
         lctions = 'geo_id'
         rngclrmin, rngclrmax = 0, 0.1
         lbls = 'Gentrification Prediction 10 Yrs - RedHook'
+        lat,lon,zoo = 40.67, -74, 12
 
 
     
-    plotmap = px.choropleth_mapbox(typeofmap, geojson=geojsonobject,locations = lctions, featureidkey=fidkey, color=clr, color_continuous_scale="RdBu_r", range_color=(rngclrmin, rngclrmax), mapbox_style="carto-positron", zoom=9, center = {"lat": 40.71, "lon": -74}, opacity=0.55, labels={'prediction':'Pred'})
+    plotmap = px.choropleth_mapbox(typeofmap, geojson=geojsonobject,locations = lctions, featureidkey=fidkey, color=clr, color_continuous_scale="RdBu_r", range_color=(rngclrmin, rngclrmax), mapbox_style="carto-positron", zoom=zoo, center = {"lat": lat, "lon": lon}, opacity=0.55, labels={'prediction':'Pred'})
     plotmap.update_layout(margin={"r":0,"t":0,"l":0,"b":10})
     plotmap.update_layout({'height': 500, 'width': 1000})
     return plotmap
