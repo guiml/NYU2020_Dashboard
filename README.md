@@ -1,4 +1,4 @@
-# NYU CUSP 2020 - CEQR Capstone project
+# NYU CUSP 2020 - CEQR Capstone project Visualization Tool
 
 ## General description (scope)
 
