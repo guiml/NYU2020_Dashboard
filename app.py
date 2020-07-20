@@ -46,20 +46,7 @@ with open('data/ny_clipped_gp_2018.geojson') as response:
 with open('data/ny_zip.geojson') as response:
     ny_zip = json.load(response)
 
-
-typeofmap = gentrification_2018_ny
-geojsonobject = ny_map
-fidkey = 'properties.geo_id'
-clr = 'prediction'
-lctions = 'geo_id'
-rngclrmin, rngclrmax = 0, 1
-lbls = 'Gentrification Prediction - NY'
-plotmap = px.choropleth_mapbox(typeofmap, geojson=geojsonobject,locations = lctions, featureidkey=fidkey, color=clr, color_continuous_scale="RdBu_r", range_color=(rngclrmin, rngclrmax), mapbox_style="carto-positron", zoom=9, center = {"lat": 40.71, "lon": -74}, opacity=0.55, labels={'prediction':'Pred'})
-plotmap.update_layout(margin={"r":0,"t":0,"l":0,"b":10})
-plotmap.update_layout({'height': 500, 'width': 1000})
-
 ## FURTHER CHARTS
-
 ny_trace = go.Scatter(
     name='New York',
     x=pred_df_ny['date'],
@@ -76,8 +63,6 @@ rh_trace = go.Scatter(
     line=dict(color='rgb(205,92,92)'),
     fillcolor='rgba(68, 68, 68, 0.3)')
 
-# Trace order can be important
-# with continuous error bars
 data = [ny_trace, rh_trace]
 
 layout = go.Layout(
@@ -96,7 +81,9 @@ fig_further1.update_layout(shapes=[
 ])
 fig_further1.update_layout({'height': 350, 'width': 1005})
 
+## APPLICATION START
 
+## LAYOUT DESIGN
 app.layout = html.Div(className="row",
     children=[
         html.Div(className='column left',
@@ -149,6 +136,8 @@ app.layout = html.Div(className="row",
             ])
     ])
 
+
+## CALLBACKS (to update the charts)
 @app.callback(
     Output('displacement_map', 'figure'),
     [Input('map-selector', 'value')])
@@ -224,4 +213,4 @@ def update_figure(selected_map):
     return plotmap
 
 if __name__ == '__main__':
-    app.run_server(debug=True)
+    app.run_server(debug=False)
